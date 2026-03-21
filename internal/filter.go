@@ -28,12 +28,14 @@ func FilterByExt(files []string, exts string) []string {
 }
 
 // FilterByExclude removes files matching the given glob pattern.
+// Matches against both the full path and the basename.
 func FilterByExclude(files []string, pattern string) []string {
 	var result []string
 	for _, f := range files {
-		base := filepath.Base(f)
-		matched, err := filepath.Match(pattern, base)
-		if err != nil || !matched {
+		// Try matching against full path first, then basename
+		matchedFull, _ := filepath.Match(pattern, f)
+		matchedBase, _ := filepath.Match(pattern, filepath.Base(f))
+		if !matchedFull && !matchedBase {
 			result = append(result, f)
 		}
 	}

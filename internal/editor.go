@@ -38,6 +38,12 @@ var gotoPlusEditors = map[string]bool{
 	"nvim": true,
 }
 
+// Terminal editors that need stdin and foreground execution
+var terminalEditors = map[string]bool{
+	"vim":  true,
+	"nvim": true,
+}
+
 // DetectEditor tries to find an available editor, checking $EDITOR env var first,
 // then common GUI editors in order of preference.
 func DetectEditor() string {
@@ -66,8 +72,15 @@ func OpenFiles(editor string, files []string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("failed to open editor '%s': %w", bin, err)
+	if terminalEditors[bin] {
+		cmd.Stdin = os.Stdin
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to run editor '%s': %w", bin, err)
+		}
+	} else {
+		if err := cmd.Start(); err != nil {
+			return fmt.Errorf("failed to open editor '%s': %w", bin, err)
+		}
 	}
 
 	return nil
@@ -125,8 +138,15 @@ func OpenFilesWithLines(editor string, files []string, lines map[string]int) err
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("failed to open editor '%s': %w", bin, err)
+	if terminalEditors[bin] {
+		cmd.Stdin = os.Stdin
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("failed to run editor '%s': %w", bin, err)
+		}
+	} else {
+		if err := cmd.Start(); err != nil {
+			return fmt.Errorf("failed to open editor '%s': %w", bin, err)
+		}
 	}
 
 	return nil

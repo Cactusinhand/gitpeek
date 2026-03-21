@@ -118,12 +118,9 @@ func parseDiffForLines(diff string) map[string]int {
 	var currentFile string
 
 	for _, line := range strings.Split(diff, "\n") {
-		// Match: diff --git a/path b/path
-		if strings.HasPrefix(line, "diff --git ") {
-			parts := strings.Split(line, " b/")
-			if len(parts) == 2 {
-				currentFile = parts[1]
-			}
+		// Use "+++ b/path" line which is unambiguous
+		if strings.HasPrefix(line, "+++ b/") {
+			currentFile = line[6:]
 		}
 		// Match: @@ -old,count +new,count @@
 		if strings.HasPrefix(line, "@@") && currentFile != "" {
@@ -200,12 +197,14 @@ func parseNameStatus(output []byte) []FileChange {
 	}
 	var changes []FileChange
 	for _, line := range strings.Split(raw, "\n") {
-		fields := strings.Fields(line)
-		if len(fields) >= 2 {
-			status := string(fields[0][0]) // Take first char (R100 → R)
-			path := fields[len(fields)-1]  // For renames, take the new path
-			changes = append(changes, FileChange{Status: status, Path: path})
+		// git name-status output is tab-separated: STATUS\tPATH or STATUS\tOLD\tNEW
+		parts := strings.SplitN(line, "\t", 3)
+		if len(parts) < 2 {
+			continue
 		}
+		status := string(parts[0][0]) // Take first char (R100 → R)
+		path := parts[len(parts)-1]   // For renames, take the new path
+		changes = append(changes, FileChange{Status: status, Path: path})
 	}
 	return changes
 }
