@@ -19,17 +19,32 @@ var editors = map[string]string{
 	"neovim":  "nvim",
 }
 
+// DetectEditor tries to find an available editor, checking $EDITOR env var first,
+// then common GUI editors in order of preference.
+func DetectEditor() string {
+	if env := os.Getenv("EDITOR"); env != "" {
+		if _, err := exec.LookPath(env); err == nil {
+			return env
+		}
+	}
+	// Try common editors in order
+	for _, bin := range []string{"cursor", "code", "zed", "subl", "nvim", "vim"} {
+		if _, err := exec.LookPath(bin); err == nil {
+			return bin
+		}
+	}
+	return ""
+}
+
 // OpenFiles opens the given files in the specified editor.
 func OpenFiles(editor string, files []string) error {
 	bin, ok := editors[editor]
 	if !ok {
-		// If not in the map, try using the value directly as a command
 		bin = editor
 	}
 
-	// Verify the editor command exists
 	if _, err := exec.LookPath(bin); err != nil {
-		return fmt.Errorf("editor '%s' (command: '%s') not found in PATH", editor, bin)
+		return fmt.Errorf("editor '%s' (command: '%s') not found in PATH, use --terminal to specify one", editor, bin)
 	}
 
 	cmd := exec.Command(bin, files...)

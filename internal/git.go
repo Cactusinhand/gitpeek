@@ -49,14 +49,36 @@ func GetStagedFiles() ([]string, error) {
 	return splitLines(output), nil
 }
 
-// GetUnstagedFiles returns files that have been modified but not staged.
+// GetUnstagedFiles returns files that have been modified but not staged,
+// plus untracked files.
 func GetUnstagedFiles() ([]string, error) {
+	// Modified tracked files
 	cmd := exec.Command("git", "diff", "--name-only")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get unstaged files: %w", err)
 	}
-	return splitLines(output), nil
+	files := splitLines(output)
+
+	// Untracked files
+	cmd2 := exec.Command("git", "ls-files", "--others", "--exclude-standard")
+	output2, err := cmd2.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get untracked files: %w", err)
+	}
+	untracked := splitLines(output2)
+
+	// Deduplicate
+	seen := make(map[string]bool, len(files))
+	for _, f := range files {
+		seen[f] = true
+	}
+	for _, f := range untracked {
+		if !seen[f] {
+			files = append(files, f)
+		}
+	}
+	return files, nil
 }
 
 func getRangeFiles(rangeRef string) ([]string, error) {

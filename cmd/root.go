@@ -95,7 +95,10 @@ func run(cmd *cobra.Command, args []string) error {
 	// Determine editor
 	editor := terminal
 	if editor == "" {
-		editor = "code"
+		editor = internal.DetectEditor()
+		if editor == "" {
+			return fmt.Errorf("no editor found in PATH, use --terminal to specify one")
+		}
 	}
 
 	if err := internal.OpenFiles(editor, files); err != nil {
