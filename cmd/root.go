@@ -20,9 +20,12 @@ var (
 	dryRun   bool
 )
 
+var Version = "0.1.0"
+
 var rootCmd = &cobra.Command{
-	Use:   "gopen [commit-ref]",
-	Short: "Batch open files changed in a git commit",
+	Use:     "gopen [commit-ref]",
+	Short:   "Batch open files changed in a git commit",
+	Version: Version,
 	Long: `gopen is a CLI tool that batch opens files from a git commit
 in your preferred editor.
 
