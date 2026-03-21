@@ -9,6 +9,11 @@ import (
 // GetChangedFiles returns the list of changed files for a given commit ref.
 // For merge commits with no file changes, it returns an empty slice.
 func GetChangedFiles(commitRef string) ([]string, error) {
+	// Check if it's a commit range (contains "..")
+	if strings.Contains(commitRef, "..") {
+		return getRangeFiles(commitRef)
+	}
+
 	// Verify the commit ref is valid
 	if err := verifyCommitRef(commitRef); err != nil {
 		return nil, err
@@ -21,8 +26,6 @@ func GetChangedFiles(commitRef string) ([]string, error) {
 	}
 
 	if isMerge {
-		// For merge commits, use diff-tree which returns empty for merge commits
-		// unless there were conflict resolutions
 		files, err := diffTree(commitRef)
 		if err != nil {
 			return nil, err
@@ -36,6 +39,47 @@ func GetChangedFiles(commitRef string) ([]string, error) {
 	return diffTree(commitRef)
 }
 
+// GetStagedFiles returns files that have been staged (git add) but not yet committed.
+func GetStagedFiles() ([]string, error) {
+	cmd := exec.Command("git", "diff", "--cached", "--name-only")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get staged files: %w", err)
+	}
+	return splitLines(output), nil
+}
+
+// GetUnstagedFiles returns files that have been modified but not staged.
+func GetUnstagedFiles() ([]string, error) {
+	cmd := exec.Command("git", "diff", "--name-only")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get unstaged files: %w", err)
+	}
+	return splitLines(output), nil
+}
+
+func getRangeFiles(rangeRef string) ([]string, error) {
+	// Verify both ends of the range
+	parts := strings.SplitN(rangeRef, "..", 2)
+	if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+		return nil, fmt.Errorf("invalid commit range '%s', expected format: ref1..ref2", rangeRef)
+	}
+
+	for _, ref := range parts {
+		if err := verifyCommitRef(ref); err != nil {
+			return nil, err
+		}
+	}
+
+	cmd := exec.Command("git", "diff", "--name-only", rangeRef)
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get files for range '%s': %w", rangeRef, err)
+	}
+	return splitLines(output), nil
+}
+
 func verifyCommitRef(ref string) error {
 	cmd := exec.Command("git", "rev-parse", "--verify", ref)
 	output, err := cmd.CombinedOutput()
@@ -46,7 +90,6 @@ func verifyCommitRef(ref string) error {
 }
 
 func isMergeCommit(ref string) (bool, error) {
-	// A merge commit has more than one parent
 	cmd := exec.Command("git", "cat-file", "-p", ref)
 	output, err := cmd.Output()
 	if err != nil {
@@ -58,7 +101,6 @@ func isMergeCommit(ref string) (bool, error) {
 		if strings.HasPrefix(line, "parent ") {
 			parentCount++
 		}
-		// Stop after the header (empty line separates header from message)
 		if line == "" {
 			break
 		}
@@ -73,12 +115,13 @@ func diffTree(ref string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get changed files: %w", err)
 	}
+	return splitLines(output), nil
+}
 
+func splitLines(output []byte) []string {
 	raw := strings.TrimSpace(string(output))
 	if raw == "" {
-		return nil, nil
+		return nil
 	}
-
-	files := strings.Split(raw, "\n")
-	return files, nil
+	return strings.Split(raw, "\n")
 }
