@@ -1,6 +1,6 @@
 package main
 
-import "github.com/lilinchao/gopen/cmd"
+import "github.com/Cactusinhand/gitpeek/cmd"
 
 func main() {
 	cmd.Execute()

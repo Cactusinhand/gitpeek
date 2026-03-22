@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lilinchao/gopen/internal"
+	"github.com/Cactusinhand/gitpeek/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -23,29 +23,29 @@ var (
 var Version = "0.1.0"
 
 var rootCmd = &cobra.Command{
-	Use:     "gopen [commit-ref]",
+	Use:     "gitpeek [commit-ref]",
 	Short:   "Batch open files changed in a git commit",
 	Version: Version,
-	Long: `gopen is a CLI tool that batch opens files from a git commit
+	Long: `gitpeek is a CLI tool that batch opens files from a git commit
 in your preferred editor.
 
 Examples:
-  gopen HEAD                         # open files in latest commit
-  gopen HEAD^                        # open files in previous commit
-  gopen abc1234                      # open files in a specific commit
-  gopen HEAD~3..HEAD                 # open files changed in last 3 commits
-  gopen stash@{0}                    # open files in a stash
-  gopen --staged                     # open staged files
-  gopen --unstaged                   # open unstaged/untracked files
-  gopen HEAD --terminal cursor       # open in Cursor editor
-  gopen HEAD --ext .go,.ts           # only open .go and .ts files
-  gopen HEAD --exclude "*_test.go"   # exclude test files
-  gopen HEAD --dir src/              # only open files under src/
-  gopen HEAD --status added          # only open newly added files
-  gopen HEAD --goto-line             # open files at first changed line
-  gopen HEAD --dry-run               # list files without opening
+  gitpeek HEAD                         # open files in latest commit
+  gitpeek HEAD^                        # open files in previous commit
+  gitpeek abc1234                      # open files in a specific commit
+  gitpeek HEAD~3..HEAD                 # open files changed in last 3 commits
+  gitpeek stash@{0}                    # open files in a stash
+  gitpeek --staged                     # open staged files
+  gitpeek --unstaged                   # open unstaged/untracked files
+  gitpeek HEAD --terminal cursor       # open in Cursor editor
+  gitpeek HEAD --ext .go,.ts           # only open .go and .ts files
+  gitpeek HEAD --exclude "*_test.go"   # exclude test files
+  gitpeek HEAD --dir src/              # only open files under src/
+  gitpeek HEAD --status added          # only open newly added files
+  gitpeek HEAD --goto-line             # open files at first changed line
+  gitpeek HEAD --dry-run               # list files without opening
 
-Config file (~/.gopenrc):
+Config file (~/.gitpeekrc):
   {"terminal": "cursor", "ext": ".go", "exclude": "*_test.go"}`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: run,

@@ -1,4 +1,4 @@
-module github.com/lilinchao/gopen
+module github.com/Cactusinhand/gitpeek
 
 go 1.26.1
 

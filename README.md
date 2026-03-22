@@ -1,44 +1,44 @@
-# gopen
+# gitpeek
 
 Batch open files changed in a git commit, in your preferred editor.
 
 ## Install
 
 ```bash
-go install github.com/Cactusinhand/gopen@latest
+go install github.com/Cactusinhand/gitpeek@latest
 ```
 
 Or build from source:
 
 ```bash
-git clone https://github.com/Cactusinhand/gopen.git
-cd gopen
-go build -o gopen .
+git clone https://github.com/Cactusinhand/gitpeek.git
+cd gitpeek
+go build -o gitpeek .
 ```
 
 ## Usage
 
 ```bash
 # Open files in latest commit
-gopen HEAD
+gitpeek HEAD
 
 # Open files in previous commit
-gopen HEAD^
+gitpeek HEAD^
 
 # Open files in a specific commit
-gopen abc1234
+gitpeek abc1234
 
 # Open files changed in last 3 commits
-gopen HEAD~3..HEAD
+gitpeek HEAD~3..HEAD
 
 # Open files in a stash
-gopen stash@{0}
+gitpeek stash@{0}
 
 # Open staged files
-gopen --staged
+gitpeek --staged
 
 # Open unstaged/untracked files
-gopen --unstaged
+gitpeek --unstaged
 ```
 
 ## Flags
@@ -58,21 +58,21 @@ gopen --unstaged
 
 ```bash
 # Open only .go files, exclude tests
-gopen HEAD --ext .go --exclude "*_test.go"
+gitpeek HEAD --ext .go --exclude "*_test.go"
 
 # Open newly added files under src/
-gopen HEAD --status added --dir src/
+gitpeek HEAD --status added --dir src/
 
 # Preview which files would be opened
-gopen HEAD --dry-run
+gitpeek HEAD --dry-run
 
 # Open files at their first changed line in Cursor
-gopen HEAD --goto-line --terminal cursor
+gitpeek HEAD --goto-line --terminal cursor
 ```
 
 ## Config
 
-Create `~/.gopenrc` to set defaults:
+Create `~/.gitpeekrc` to set defaults:
 
 ```json
 {
@@ -95,7 +95,7 @@ CLI flags override config values.
 | Neovim | `nvim` | `+line file` |
 | Vim | `vim` | `+line file` |
 
-If `--terminal` is not specified, gopen auto-detects by checking `$EDITOR`, then trying editors in order: cursor, code, zed, subl, nvim, vim.
+If `--terminal` is not specified, gitpeek auto-detects by checking `$EDITOR`, then trying editors in order: cursor, code, zed, subl, nvim, vim.
 
 ## License
 

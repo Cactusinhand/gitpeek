@@ -8,7 +8,7 @@ import (
 
 func TestLoadConfig_ValidFile(t *testing.T) {
 	tmpDir := t.TempDir()
-	configPath := filepath.Join(tmpDir, ".gopenrc")
+	configPath := filepath.Join(tmpDir, ".gitpeekrc")
 
 	content := `{"terminal": "cursor", "ext": ".go,.ts", "exclude": "*_test.go"}`
 	if err := os.WriteFile(configPath, []byte(content), 0644); err != nil {
@@ -49,7 +49,7 @@ func TestLoadConfig_MissingFile(t *testing.T) {
 
 func TestLoadConfig_InvalidJSON(t *testing.T) {
 	tmpDir := t.TempDir()
-	configPath := filepath.Join(tmpDir, ".gopenrc")
+	configPath := filepath.Join(tmpDir, ".gitpeekrc")
 
 	if err := os.WriteFile(configPath, []byte("not json"), 0644); err != nil {
 		t.Fatal(err)
@@ -69,7 +69,7 @@ func TestLoadConfig_InvalidJSON(t *testing.T) {
 
 func TestLoadConfig_PartialFields(t *testing.T) {
 	tmpDir := t.TempDir()
-	configPath := filepath.Join(tmpDir, ".gopenrc")
+	configPath := filepath.Join(tmpDir, ".gitpeekrc")
 
 	content := `{"terminal": "zed"}`
 	if err := os.WriteFile(configPath, []byte(content), 0644); err != nil {

@@ -6,14 +6,14 @@ import (
 	"path/filepath"
 )
 
-// Config holds persistent user preferences loaded from ~/.gopenrc
+// Config holds persistent user preferences loaded from ~/.gitpeekrc
 type Config struct {
 	Terminal string `json:"terminal,omitempty"`
 	Ext      string `json:"ext,omitempty"`
 	Exclude  string `json:"exclude,omitempty"`
 }
 
-// LoadConfig reads config from ~/.gopenrc. Returns empty config if file doesn't exist.
+// LoadConfig reads config from ~/.gitpeekrc. Returns empty config if file doesn't exist.
 func LoadConfig() Config {
 	var cfg Config
 	home, err := os.UserHomeDir()
@@ -21,7 +21,7 @@ func LoadConfig() Config {
 		return cfg
 	}
 
-	data, err := os.ReadFile(filepath.Join(home, ".gopenrc"))
+	data, err := os.ReadFile(filepath.Join(home, ".gitpeekrc"))
 	if err != nil {
 		return cfg
 	}
